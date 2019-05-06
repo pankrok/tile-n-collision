@@ -1,5 +1,5 @@
-
-#include "bob.h"
+#include "collision.hpp"
+#include "bob.hpp"
 
 Bob::Bob()
 {
@@ -68,19 +68,34 @@ void Bob::stopDown()
 // the time elapsed, and the speed
 void Bob::update(float elapsedTime, const int* collision)
 {
+    Collision m_collision;
+    m_bounds = m_Sprite.getGlobalBounds();
+
+    const int level[] =
+    {
+        0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
+        0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0,
+        1, 1, 0, 0, 0, 0, 0, 0, 3, 0, 3, 3, 3, 3, 3, 3, 0, 0, 0,
+        0, 1, 0, 0, 2, 0, 3, 3, 3, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+        0, 1, 1, 0, 3, 3, 3, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0,
+        0, 0, 1, 0, 3, 0, 2, 2, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0,
+        2, 0, 1, 0, 3, 0, 2, 2, 2, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0,
+        0, 0, 1, 0, 3, 2, 2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0,
+    };
+
     if (m_RightPressed)
     {
         oldPosition = m_Position.x;
         m_Position.x += m_Speed * elapsedTime;
-
-        x = int((m_Position.x) / 32 );
-        y = 8-((x+ 16*(int((m_Position.y)/ 32)))*(-1));
-
-        newPosition = x + y;
-
-        if( collision[newPosition] != 0 || x < 0 || y < 0 ) {
+        if( m_bounds.contains(512, m_Position.y) ) {
           m_Position.x = oldPosition;
         }
+        if(m_collision.check(sf::Vector2f(32, 32), level, 19, 8, sf::Vector2f(m_Position.x, m_Position.y)))
+        {
+          m_Position.x = oldPosition;
+        }
+
+
     }
 
     if (m_LeftPressed)
@@ -88,27 +103,48 @@ void Bob::update(float elapsedTime, const int* collision)
         oldPosition = m_Position.x;
         m_Position.x -= m_Speed * elapsedTime;
 
-        x = int((m_Position.x) / 32 );
-        y = 8-((x+ 16*(int((m_Position.y)/ 32)))*(-1));
-
         newPosition = x + y;
 
-        if( collision[newPosition] != 0 || x < 0 || y < 0 ) {
+        if( m_bounds.contains(0, m_Position.y) ) {
           m_Position.x = oldPosition;
         }
+        if(m_collision.check(sf::Vector2f(32, 32), level, 19, 8, sf::Vector2f(m_Position.x, m_Position.y)))
+        {
+          m_Position.x = oldPosition;
+        }
+
     }
 
     if (m_DownPressed)
     {
+        oldPosition = m_Position.y;
         m_Position.y += m_Speed * elapsedTime;
+        if( m_bounds.contains(m_Position.x, 256) ) {
+          m_Position.y = oldPosition;
+        }
+                if(m_collision.check(sf::Vector2f(32, 32), level, 19, 8, sf::Vector2f(m_Position.x, m_Position.y)))
+        {
+          m_Position.y = oldPosition;
+        }
+
     }
 
     if (m_UpPressed)
     {
+        oldPosition = m_Position.y;
         m_Position.y -= m_Speed * elapsedTime;
+        if( m_bounds.contains(m_Position.x, 0) ) {
+          m_Position.y = oldPosition;
+        }
+        if(m_collision.check(sf::Vector2f(32, 32), level, 19, 8, sf::Vector2f(m_Position.x, m_Position.y)))
+        {
+          m_Position.y = oldPosition;
+        }
     }
     //std::cout << int((m_Position.y)/ 32) << std::endl;
     // Now move the sprite to its new position
+
     m_Sprite.setPosition(m_Position);
 
 }
+
