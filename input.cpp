@@ -1,4 +1,4 @@
-#include "bob.h"
+#include "bob.hpp"
 
 void Bob::input()
 {
